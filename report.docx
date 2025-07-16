@@ -1,0 +1,74 @@
+### **Employee Sentiment Analysis Final Report**
+
+---
+
+#### **Task 1: Sentiment Labeling**
+
+- Used Hugging Face’s `distilbert-base-uncased-finetuned-sst-2-english` model
+- Added a `Sentiment` column with values: Positive, Negative, or Neutral
+- Fallback logic used `subject` when `body` was missing
+- Dataset saved to `labeled_messages.csv`
+
+---
+
+#### **Task 2: Exploratory Data Analysis (EDA)**
+
+- Explored missing data patterns, sentiment distributions, and message trends
+- Key findings:
+  - 145 emails with no subject
+  - Top 5 most active employees identified
+-all messages labeled positive, negative, neutral
+-combined subject with body for sentiment analysis
+The dataset contains 2,191 rows and 7 columns.
+All columns are of type object, except for date_parsed, which is a datetime64. 
+The sentiments distribute heavily, almost equally, towards positive and neutral, and very lightly towards negative.
+Monthly sentiment trends can now be explored in visualizations (e.g., bar plots) to detect engagement fluctuations over time. A few employees stood out as high-volume senders. These employees may warrant further review in scoring and flight risk analysis.
+- Visuals saved in `/visualization/`
+
+---
+
+#### **Task 3: Monthly Sentiment Scores**
+
+- Mapped sentiments to scores: +1 (Positive), 0 (Neutral), -1 (Negative)
+- Grouped by sender and month
+- Exported to `monthly_sentiment_scores.csv`
+
+---
+
+#### **Task 4: Ranking Employees**
+
+- Ranked top 3 and bottom 3 employees by sentiment score each month
+- Based on score descending (positive) and ascending (negative)
+- Results stored in `monthly_employee_rankings.csv`
+
+---
+
+#### **Task 5: Flight Risk Detection**
+
+- Defined at-risk employees as those with ≥4 negative messages in any 30-day window
+- Filtered and flagged employees using rolling checks
+- Flag list saved to `flight_risk_employees.csv`
+
+---
+
+#### **Task 6: Sentiment Score Prediction**
+
+- Features used:
+  - Message count per month
+  - Avg message length
+  - Avg word count
+- Model: Linear Regression (`sklearn`)
+- Results:
+  - R² Score: 0.42765020804350784
+  - RMSE: 1.994649338696962
+- Coefficients showed which features most influenced predicted sentiment
+          Feature  Coefficient
+0       msg_count     0.347254
+1  avg_msg_length    -0.004865
+2  avg_word_count     0.039418
+
+*Conclusion:
+Message count had the strongest positive influence on sentiment, suggesting more frequent communication tends to be more positive.
+Average message length and average word count have a weak linear relationship with sentiment
+
+
