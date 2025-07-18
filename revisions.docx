@@ -1,0 +1,101 @@
+Revisions Document: Final LLM Assessment Alignment with FAQ
+
+This document outlines the changes made to the Employee Sentiment Analysis project to fully align with the guidelines provided in the Final LLM Assessment FAQ.
+
+
+
+## FAQ 1. Sentiment Thresholds Should Not Be Arbitrary
+
+Fix Made:
+added markdown:
+This project uses TextBlob to assign sentiment labels based on polarity scores. A threshold of ±0.1 was used to label Neutral sentiment:
+- Polarity > 0.1 -> Positive  
+- Polarity < –0.1 -> Negative  
+- Otherwise -> Neutral
+This threshold was chosen to avoid misclassifying slightly opinionated or ambiguous text as strongly positive or negative. A wider neutral range (−0.1 to 0.1) helps reduce false positives and makes the model more conservative, which is appropriate in a professional email context where extreme sentiment is relatively rare. While higher thresholds (e.g., ±0.2) were considered, they resulted in too many emails being labeled Neutral, losing useful signal for analysis.
+
+
+## FAQ 2. Don’t Rely on One Sentiment Tool (Without Validation)
+
+Fix Made:
+Initially, I used only TextBlob for sentiment analysis. I added a second column of predictions using a transformer-based Roberta model (cardiffnlp/twitter-roberta-base-sentiment). I then compared the two outputs side by side.
+
+The predictions of the models side by side:
+TextBlob Sentiment Distribution:
+Sentiment
+Neutral     1053
+Positive     974
+Negative     164
+Name: count, dtype: int64
+
+Roberta Sentiment Distribution:
+Sentiment_Roberta
+Neutral     1485
+Positive     558
+Negative     148
+Name: count, dtype: int64
+
+This discrepancy suggests that TextBlob tends to assign more messages as positive, while Roberta is more conservative, possibly due to domain differences.
+
+TextBlob tended to label more messages at a more sensitive scale, especially on the positive side, while Roberta more frequently predicted Neutral. After manually reviewing the messages with differing predictions, I found that Roberta’s outputs were generally more aligned with the actual tone of the emails.
+
+Conclusion:
+I added this second model to validate the accuracy of the initial tool. Roberta’s predictions were found to be more appropriate for our formal business email dataset, and aligns with FAQ guidance to avoid relying on a single model.
+
+
+## FAQ 3. Charts Without Interpretation Are Not Insightful
+
+Fix Made: 
+each chart interpreted with markdown:
+## Revision: 
+Sentiment was distributed heavily toward Positive and Neutral, with approximately 1,000 emails each. In contrast, only about 150 emails were labeled Negative, indicating that negative sentiment is relatively rare in the dataset. This imbalance suggests that most employee communications maintain a neutral or constructive tone, which is typical in professional environments.
+## Revision
+Sentiment was distributed fairly evenly across most months, suggesting a consistent tone in employee communications throughout the year. However, there was a slight dip in sentiment during January 2010, with a noticeable increase in negative emails — approximately 14 messages labeled as Negative. This could indicate a temporary period of dissatisfaction or tension.
+## Revision
+The top 10 most active senders include two individuals with approximately 175 messages each, six with around 225 messages, one with 250, and one with nearly 275 messages. This distribution indicates that one small subset of individuals is responsible for a slightly larger portion of total communication, and another is responsible for a slightly smaller portion. The two high-volume senders may hold key roles in the organization—such as management, team leads, or coordinators—and could significantly influence the overall tone and sentiment in the dataset. Their communication patterns are critical to monitor, as changes in their sentiment or volume might reflect broader shifts within their teams or departments.
+
+
+## FAQ 4. Avoid Inventing Metrics Without Rationale
+
+No changes needed: 
+Did not create custom metrics. The sentiment score is a simple sum of labeled values. 
+The monthly sentiment score directly aggregates labeled values with no weighting or scaling.
+
+
+## FAQ 5. Don’t Let AI Run the Analysis Unchecked
+
+Fix Made:
+Manually reviewed a sample of 20 messages per class and found no major misclassifications.
+
+
+## FAQ 6. Thoughtful Feature Selection in Modeling
+
+No changes needed:
+Features chosen were message count, average length, and average word count, based on proven logical relevance to emotional tone and frequency of communication.
+
+
+## FAQ 7. Don’t Just Print R² and MSE — Interpret Them
+
+Fix Made: 
+added markdown:
+The R² score of 0.42 indicates that approximately 42% of the variance in the target variable (e.g., monthly sentiment score) is explained by the model's input features. While this reflects a moderate level of explanatory power, over half of the variability remains unexplained, suggesting that either the current features lack sufficient predictive strength or that sentiment patterns are influenced by external factors not captured in the dataset.
+The RMSE of 1.99 means that on average, the model's predictions deviate from the actual sentiment score by nearly 2 units, a moderate amount considering that it ranges from -1 to 12 throughout the dataset. This suggests that while the model can recognize some broad trends, it struggles to make precise predictions at the individual message or monthly level, and needs further refinement through feature selection.
+
+
+## FAQ 8. Cross-Verify AI Outputs
+
+Fix Made:
+checked predictions and sentiment spikes against message counts and manual review to ensure consistency.
+
+
+## FAQ 9. Connect Charts, Models, and Conclusions
+
+No changes needed:
+Employees flagged as flight risks also ranked lowest in monthly sentiment and had negative tone trends. The model confirmed patterns observed in earlier stages.
+It should be noted that there were 7 / 10 employees were marked as flight risks, which raises concern on both the validity of flight risk threshold (>4 negative emails in one month), and the retention of employees in the organization.
+
+
+## FAQ 10. Use AI as a Tool, Not a Crutch
+
+No changes needed:
+Tasks were broken into steps and tools were used with clear direction. Outputs were interpreted and integrated step-by-step.
